@@ -1,4 +1,8 @@
+#!/usr/bin/env node
+
 const puppeteer = require("puppeteer");
+const cli = require("commander");
+const { prompt } = require("inquirer");
 
 //puppeteer/DeviceDescriptors is a module that has configs that align with multiple different phones
 const mobileDevices = require("puppeteer/DeviceDescriptors");
@@ -18,11 +22,13 @@ const browserConfig = {
 // Search something on google
 const searchGoogle = async (searchString = "Hello, my name is Bob.") => {
     let url = "https://www.google.com";
-    let page = await getPage(url, browserConfig);
-    await page.type('#gsr', searchString);
-    await page.keyboard.press("Enter");
-    await page.waitForNavigation();
-    
+    let searchBarSelector = "#gsr";
+    let {page} = await getPage(url, browserConfig);
+    await page.waitForSelector(searchBarSelector)
+    .then(async () => {
+        await page.type(searchBarSelector, searchString);
+        await page.keyboard.press("Enter");
+    });
 }
 
 // Create a PDF from a webpage
@@ -49,8 +55,7 @@ const extractWebpageInfo = async (url = "https://www.reddit.com") => {
 // Emulating mobile 
 // Defaults to iPhone X as the mobile device to emulate
 const emulateMobileDevice = async (url = "https://youtube.com", mobileDevice = mobileDevices["iPhone X"]) => {
-    let {browser, page} = await getPage(url, browserConfig, mobileDevice);
-    return 
+    return await getPage(url, browserConfig, mobileDevice);
 }
 
 
@@ -73,4 +78,21 @@ const getPage = async (url = "https://www.google.com", browserConfig, mobileDevi
 //searchGoogle();
 //webpageToPdf();
 //extractWebpageInfo();
-emulateMobileDevice();
+//emulateMobileDevice();
+searchQuery = [
+    {
+        type: "input",
+        name: "queryString",
+        message: "Enter a string to search on Google."
+    }
+];
+
+cli
+    .version("0.0.1")
+    .command("search")
+    .description("Searches google with supplied querystring")
+    .option("-q, --query", "Query string to search Google with" )
+    .action(() => {
+        prompt(searchQuery).then(answers => searchGoogle(answers.queryString));
+    });
+cli.parse(process.argv);
