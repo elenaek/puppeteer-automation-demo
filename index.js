@@ -2,15 +2,14 @@ let puppeteer = require("puppeteer");
 
 
 const browserConfig = {
-    headless: false,
+    headless: true,
     devtools: false,
+    ignoreHTTPSErrors: true,
     defaultViewport: {
         width: 1200,
         height: 1080
     }
 };
-
-await webpageToPdf();
 
 // Search something on google
 
@@ -26,12 +25,13 @@ const searchGoogle = async () => {
 // Create a PDF from a webpage
 
 const webpageToPdf = async () => {
-    let url = "https://learnscraping.com/";
-    let page = await getPage(url, browserConfig);
+    let url = "https://www.neogaf.com/";
+    let {browser, page} = await getPage(url, browserConfig);
     await page.pdf({
-        path: "./example.pdf",
+        path: "./pdfs/example.pdf",
         format: "A4"
     });
+    browser.close();
 }
 
 
@@ -40,5 +40,8 @@ const getPage = async (url = "https://www.google.com", config) => {
     const browser = await puppeteer.launch(config);
     const page = await browser.newPage()
     await page.goto(url)
-    return page
+    return {browser, page}
 }
+
+
+webpageToPdf();
