@@ -12,7 +12,6 @@ const browserConfig = {
 };
 
 // Search something on google
-
 const searchGoogle = async () => {
     let url = "https://www.google.com";
     let page = await getPage(url, browserConfig);
@@ -23,7 +22,6 @@ const searchGoogle = async () => {
 }
 
 // Create a PDF from a webpage
-
 const webpageToPdf = async () => {
     let url = "https://www.neogaf.com/";
     let {browser, page} = await getPage(url, browserConfig);
@@ -31,6 +29,16 @@ const webpageToPdf = async () => {
         path: "./pdfs/example.pdf",
         format: "A4"
     });
+    browser.close();
+}
+
+// Extract Title and URL of a webpage
+const extractWebpageInfo = async () => {
+    let url = "https://www.reddit.com";
+    let {browser, page} = await getPage(url, browserConfig);
+    let title = await page.title();
+    let extractedUrl = await page.url();
+    console.log(`The title of "${url}" is "${title}" and its URL is "${extractedUrl}"`);
     browser.close();
 }
 
@@ -44,4 +52,5 @@ const getPage = async (url = "https://www.google.com", config) => {
 }
 
 
-webpageToPdf();
+//webpageToPdf();
+extractWebpageInfo();
