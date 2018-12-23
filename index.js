@@ -36,8 +36,8 @@ const searchGoogle = async (searchString = "Hello, my name is Bob.") => {
 
 // Create a PDF from a webpage
 // Requires headless mode
-const webpageToPdf = async (targetUrl = "https://www.neogaf.com/", pdfPath = "./webpage_capture", openDir = false, headless = true) => {
-    headlessConfig = browserConfig.headless = headless;
+const webpageToPdf = async (targetUrl = "https://reddit.com/", pdfPath = "./webpage_capture", openDir = false, headless = true) => {
+    headlessConfig = browserConfig.headless = !headless;
     let parsedUrl = await parseUrl(targetUrl);
     let {browser, page} = await getPage(parsedUrl, headlessConfig);
     let isAbsolutePath = path.isAbsolute(pdfPath);
@@ -62,7 +62,7 @@ const webpageToPdf = async (targetUrl = "https://www.neogaf.com/", pdfPath = "./
 
 // Extract Title and URL of a webpage
 const extractWebpageInfo = async (targetUrl = "https://www.reddit.com", headless = true) => {
-    let headlessConfig = browserConfig.headless = headless;
+    let headlessConfig = browserConfig.headless = !headless;
     let parsedUrl = await parseUrl(targetUrl);
     let {browser, page} = await getPage(parsedUrl, browserConfig);
     let title = await page.title();
@@ -73,8 +73,9 @@ const extractWebpageInfo = async (targetUrl = "https://www.reddit.com", headless
 
 // Emulating mobile 
 // Defaults to iPhone X as the mobile device to emulate
-const emulateMobileDevice = async (url = "https://youtube.com", mobileDevice = mobileDevices["iPhone X"]) => {
-    return await getPage(url, browserConfig, mobileDevice);
+const emulateMobileDevice = async (targetUrl = "https://youtube.com", mobileDevice = mobileDevices["iPhone X"]) => {
+    let parsedUrl = await parseUrl(targetUrl);
+    return await getPage(parsedUrl, browserConfig, mobileDevices[mobileDevice]);
 }
 
 const parseUrl = async (parsedUrl) => {
@@ -83,7 +84,7 @@ const parseUrl = async (parsedUrl) => {
         parsedUrl.protocol = "https";
         parsedUrl = url.format(parsedUrl);
     }
-    return parsedUrl
+    return parsedUrl;
 }
 
 // Function for generating a browser tab/page
@@ -99,7 +100,7 @@ const getPage = async (url = "https://www.google.com", browserConfig, mobileDevi
         }
     }
     await page.goto(url);
-    return {browser, page}
+    return {browser, page};
 }
 
 
@@ -144,14 +145,30 @@ extractInfoQuery = [
     {
         type: "input",
         name: "url",
-        message: "Extract URL and Title from a webpage given the URL of a target webpage",
+        message: "Please enter the URL of a page to extract info from",
         default: "youtube.com"
     },
     {
         type: "confirm",
         name: "headless",
-        message: "Run the browser headlessly?",
+        message: "Show the browser?",
         default: true
+    }
+];
+
+phoneEmulationQuery = [
+    {
+        type: "input",
+        name: "url",
+        message: "Please enter the URL of a page to to view",
+        default: "youtube.com"
+    },
+    {
+        type: 'rawlist',
+        name: 'phoneToEmulate',
+        message: "Choose a phone to emulate",
+        choices: mobileDevices.map(phone => phone.name),
+        pageSize: 10
     }
 ];
 
@@ -181,6 +198,12 @@ cli
     .action(() => {
         prompt(extractInfoQuery).then(answers => extractWebpageInfo(answers.url, answers.headless));
     });
-    
+cli
+    .command("emulate")
+    .alias("emu")
+    .description("Open a webpage emulating a chosen phone")
+    .action(() => {
+        prompt(phoneEmulationQuery).then(answers => emulateMobileDevice(answers.url, answers.phoneToEmulate));
+    })
 
 cli.parse(process.argv);
