@@ -11,7 +11,7 @@ const url = require("url");
 const mobileDevices = require("puppeteer/DeviceDescriptors");
 
 
-
+//Default config for chromium
 const browserConfig = {
     headless: false,
     devtools: false,
@@ -104,6 +104,7 @@ const getPage = async (url = "https://www.google.com", browserConfig, mobileDevi
 }
 
 
+/*-----------------------INQUIRER INQUERIES-----------------------*/
 
 searchQuery = [
     {
@@ -172,6 +173,12 @@ phoneEmulationQuery = [
     }
 ];
 
+/*-----------------------INQUIRER INQUERIES END----------------------*/
+
+
+
+/*-----------------------COMMANDER COMMAND CONFIGS-----------------------*/
+
 cli
     .version("0.0.1")
     .description("Interactive shell for the puppeteer demo");
@@ -207,3 +214,5 @@ cli
     })
 
 cli.parse(process.argv);
+
+/*-----------------------COMMANDER COMMAND CONFIGS END-----------------------*/
