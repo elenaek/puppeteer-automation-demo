@@ -185,7 +185,7 @@ cli
     });
 
 cli
-    .command("capture-pdf")
+    .command("capture")
     .alias("c")
     .description("Saves a web page specified by a URL as a pdf given a name")
     .action(() => {
@@ -193,7 +193,7 @@ cli
     });
 cli
     .command("extract")
-    .alias("e")
+    .alias("ex")
     .description("Gets URL and title of a web page given a URL")
     .action(() => {
         prompt(extractInfoQuery).then(answers => extractWebpageInfo(answers.url, answers.headless));
